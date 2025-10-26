@@ -13,6 +13,14 @@ RTSP動画再生ボタンをクリックすると設定した接続先の動画�
 
 ---
 
+## 特徴
+- RTSP カメラ映像または画像ファイルに対応
+- Python スクリプトによる針検出
+- C# アプリケーションとのシームレス連携
+- ハードウェアとして LILYGO T-Camera S3 をサポート
+
+---
+
 ## 動作環境
 
 - OS: Windows 10/11
@@ -34,6 +42,33 @@ pip install opencv-python numpy ultralytics
 
 ---
 
+## プロジェクト構成
+
+```
+AnalogReader/
+├── AnalogReader.sln
+├── AnalogReader/
+│   ├── PythonScript/
+│   │   ├── main.py                        # Image processing script
+│   │   └── best.pt                        # YOLO model file
+│   ├── App.config                         # Configuration file
+│   ├── FormMain.cs                        # Main form
+│   └── Program.cs                         # Application entry point
+```
+
+---
+
+## C# と Python の連携
+
+アプリケーションは C# から Python スクリプトを呼び出し、電圧値の解析を行います。
+呼び出し時に画像ファイルパスを JSON で Python 側へ渡し、処理結果を C# 側で受け取ります。
+
+- 呼び出しスクリプト: `AnalogReader/PythonScript/main.py`
+- モデルファイル: `AnalogReader/PythonScript/best.pt`
+- C# 実装箇所: `FormMain.cs` → `DetectNeedleWithPython()` メソッド
+
+---
+
 ## 使い方
 
 1. **Visual Studio** で `AnalogReader.sln` を開く
@@ -42,9 +77,15 @@ pip install opencv-python numpy ultralytics
 
 ---
 
+## ハードウェア要件
+
+* RTSP カメラ：LILYGO T-Camera S3
+* Arduino IDE にてスケッチ `sketch_INTERN_S3_RTSP_SSD1306` をボードへ書き込み
+* 参考：`LilygoT-CameraS3設定まとめ.txt`
+
+---
+
 ## 注意事項
 
-* RTSP動画再生機能は、LILYGO の T-Camera S3 を依存しています。（設定情報は、 `LilygoT-CameraS3設定まとめ.txt` を参照してください）
-* Arduino IDEを使用して、開発ボードにスケッチを書き込みます。（書き込みコードは、`sketch_INTERN_S3_RTSP_SSD1306` にあります）
 * 動作保証はしていません。改良や実験のベースとしてご利用ください。
 * OpenAI バージョンはこちら ー＞ https://github.com/Vector5D/AnalogReaderWithOpenAI
