@@ -1,0 +1,142 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  
+
+  <ItemGroup>
+    <PackageReference Include="Emgu.CV" Version="4.4.0.4077" />
+    <PackageReference Include="Emgu.CV.Bitmap" Version="4.4.0.4077" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.4.0.4077" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.1" />
+    <PackageReference Include="OpenAI" Version="2.1.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.8.0.20230708" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.Views.WindowsForms" Version="3.119.0" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="YoloDotNet" Version="3.0.0" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\vcruntime140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\opencv_videoio_ffmpeg440.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\msvcp140_codecvt_ids.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\msvcp140_2.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\msvcp140_1.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\msvcp140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\cvextern.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\concrt140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x86\concrt140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\vcruntime140_1.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\vcruntime140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\opencv_videoio_ffmpeg440_64.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\msvcp140_codecvt_ids.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\msvcp140_2.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\msvcp140_1.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\msvcp140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\cvextern.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Remove="C:\Users\r.kurokawa\.nuget\packages\emgu.cv.runtime.windows\4.4.0.4077\build\x64\concrt140.dll" />
+  </ItemGroup>
+  
+
+  <ItemGroup>
+    <None Update="PythonScript\best.pt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PythonScript\main.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
+
+</Project>
