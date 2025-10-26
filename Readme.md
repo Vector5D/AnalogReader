@@ -88,4 +88,4 @@ AnalogReader/
 ## 注意事項
 
 * 動作保証はしていません。改良や実験のベースとしてご利用ください。
-* OpenAI バージョンはこちら ー＞ https://github.com/Vector5D/AnalogReaderWithOpenAI
+* 早期バージョンはこちら ー＞ https://github.com/Vector5D/AnalogReaderWithOpenAI
