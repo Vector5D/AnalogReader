@@ -1,6 +1,6 @@
 # AnalogReader
 
-![AnalogReader](/AnalogReader.png)
+![AnalogReader](/Image.png)
 
 ---
 
