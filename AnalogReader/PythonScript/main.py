@@ -12,13 +12,13 @@ os.environ["ULTRALYTICS_VERBOSITY"] = "0"
 os.environ["YOLO_VERBOSE"] = "false"
 
 # 指針の範囲
-MIN_ANGLE = 129.42
-MAX_ANGLE = 49.23
+MIN_ANGLE = 130
+MAX_ANGLE = 50
 # 電圧の範囲 
 MIN_VOLTAGE = 0.0
 MAX_VOLTAGE = 3.0
 # 軸を計算するためのオフセット値
-OFF_SET = 120
+OFF_SET = 100
 # YOLO導入
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(SCRIPT_DIR, "best.pt")
@@ -178,16 +178,16 @@ def measure_voltage(image):
                 [vx, vy, x0, y0] = cv2.fitLine(points, cv2.DIST_L2, 0, 0.01, 0.01)
 
                 # 線を描く
-                length = 200
+                length = 150
                 x1 = int(x0[0] - vx[0] * length)
                 y1 = int(y0[0] - vy[0] * length)
                 x2 = int(x0[0] + vx[0] * length)
                 y2 = int(y0[0] + vy[0] * length)
 
             else:
-                print("座標抽出が失敗した")
+                raise ValueError("座標抽出が失敗した")
         else:
-            print("マスク領域が特定できない")
+            raise ValueError("マスク領域が特定できない")
 
         # 電圧計の軸を特定する
         h, w, _ = img.shape
@@ -200,7 +200,9 @@ def measure_voltage(image):
 
         # C#に渡す用に描画・確認
         debug_line = img.copy()
-        cv2.line(debug_line, (x1, y1), (x2, y2), (0, 0, 255), 2) # 指针：红色
+        cv2.line(debug_line, (center[0], center[1]), (tip[0], tip[1]), (0, 0, 255), 2) # 指针：红色
+        cv2.circle(debug_line, center, 10, (255, 0, 0), -1)  # 軸：青色
+        cv2.circle(debug_line, tip, 10, (0, 255, 0), -1)     # 先端：緑色
 
         annot_rel_path = drel(f"annotated_{ts}.jpg")
         cv2.imwrite(dpath(os.path.basename(annot_rel_path)), debug_line)
