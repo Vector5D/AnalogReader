@@ -46,6 +46,10 @@ namespace AnalogReader
             /// </summary>
             public string? DetectionMethod { get; set; }
             /// <summary>
+            /// マスク適用画像一時保管ファイルパス
+            /// </summary>
+            public string? MaskImagePath { get; set; }
+            /// <summary>
             /// 針描画画像一時保管ファイルパス
             /// </summary>
             public string? AnnotatedImagePath { get; set; }
@@ -60,6 +64,7 @@ namespace AnalogReader
             public double angle_deg { get; set; }
             public double value { get; set; }
             public double confidence { get; set; }
+            public string? mask_path { get; set; }
             public string? annotated_path { get; set; }
             public string? error { get; set; }
         }
@@ -364,6 +369,11 @@ namespace AnalogReader
                             ShowPictureThenDelete(pbCroppedImage, needleResult.AnnotatedImagePath);
                         }
 
+                        if (!string.IsNullOrEmpty(needleResult.MaskImagePath) &&
+                            File.Exists(needleResult.MaskImagePath))
+                        {
+                            ShowPictureThenDelete(pbOriginalImage, needleResult.MaskImagePath);
+                        }
 
                         Debug.WriteLine($"針検出成功！");
                         Debug.WriteLine($"電圧値: {needleResult.MeterValue:F2}V");
@@ -383,6 +393,11 @@ namespace AnalogReader
                             ShowPictureThenDelete(pbCroppedImage, needleResult.AnnotatedImagePath);
                         }
 
+                        if (!string.IsNullOrEmpty(needleResult?.MaskImagePath) &&
+                            File.Exists(needleResult.MaskImagePath))
+                        {
+                            ShowPictureThenDelete(pbOriginalImage, needleResult.MaskImagePath);
+                        }
                     }
 
                     // 後処理：一時ファイル削除
@@ -703,7 +718,7 @@ namespace AnalogReader
                         DetectionMethod = "Pythonエラー",
                         Confidence = 0.0,
                         ErrorMessage = string.IsNullOrWhiteSpace(stderr) ? py.error : $"{py.error} | {stderr.Trim()}",
-                        //MaskImagePath = Fix(py.mask_path, scriptDir),
+                        MaskImagePath = Fix(py.mask_path, scriptDir),
                         AnnotatedImagePath = Fix(py.annotated_path, scriptDir)
                     };
                 }
@@ -717,6 +732,7 @@ namespace AnalogReader
                         MeterValue = py.value,
                         Confidence = py.confidence,
                         DetectionMethod = "Python処理",
+                        MaskImagePath = Fix(py.mask_path, scriptDir),
                         AnnotatedImagePath = Fix(py.annotated_path, scriptDir)
                     };
                     return detectedResult;
