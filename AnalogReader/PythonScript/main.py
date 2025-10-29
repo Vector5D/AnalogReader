@@ -49,6 +49,20 @@ def _order_points_tl_tr_br_bl(pts: np.ndarray) -> np.ndarray:
     rect[3] = pts[np.argmax(diff)]  # BL
     return rect
 
+def evaluate_confidence(angle_deg, line_angle):
+    """信頼度評価関数"""
+    if angle_deg < MAX_ANGLE-5 or angle_deg > MIN_ANGLE+5:
+        return 0.0
+    
+    dist_to_0 = abs(line_angle - 0)
+    dist_to_180 = abs(line_angle - 180)    
+    min_dist = min(dist_to_0, dist_to_180)    
+
+    tol = 10.0  # 許容範囲（度） 
+    conf_line = math.exp(-(min_dist / tol) ** 2)
+
+    return round(conf_line, 4)
+
 def crop_with_highest_confidence(image, model, ts):
     """YOLO セグメンテーションで最も信頼度の高いマスク領域を台形変換で切り出す。
 
@@ -124,14 +138,10 @@ def crop_with_highest_confidence(image, model, ts):
     return warped, mask_rel_path
 
 # 読み取りの計算
-def measure_voltage(image):
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    mask_rel_path = ""
+def measure_voltage(img, mask_rel_path):
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     annot_rel_path = ""
     try:
-        model = YOLO(MODEL_PATH)
-        img, mask_rel_path = crop_with_highest_confidence(image, model, ts)
-
         # 640*640にリサイズ
         target_size = 640
         img = cv2.resize(img, (target_size, target_size), interpolation=cv2.INTER_AREA)
@@ -177,12 +187,20 @@ def measure_voltage(image):
                 # 直線フィッティング
                 [vx, vy, x0, y0] = cv2.fitLine(points, cv2.DIST_L2, 0, 0.01, 0.01)
 
-                # 線を描く
-                length = 150
-                x1 = int(x0[0] - vx[0] * length)
-                y1 = int(y0[0] - vy[0] * length)
-                x2 = int(x0[0] + vx[0] * length)
-                y2 = int(y0[0] + vy[0] * length)
+                # 各点をフィッティングラインに投影する
+                dx = points[:, 0] - x0
+                dy = points[:, 1] - y0
+                t = dx * vx + dy * vy
+
+                # 投影が最も遠い2点を見つける（針の両端に対応）
+                idx_min = np.argmin(t)
+                idx_max = np.argmax(t)
+                p1 = points[idx_min]
+                p2 = points[idx_max]
+
+                # 針の端点座標
+                x_tip1, y_tip1 = p1
+                x_tip2, y_tip2 = p2
 
             else:
                 raise ValueError("座標抽出が失敗した")
@@ -194,18 +212,29 @@ def measure_voltage(image):
         center = (w // 2, h // 2 + OFF_SET)
 
         # 指針の端点を特定する
-        dist1 = np.hypot(x1 - center[0], y1 - center[1])
-        dist2 = np.hypot(x2 - center[0], y2 - center[1])
-        tip = (x1, y1) if dist1 > dist2 else (x2, y2)
+        dist1 = np.hypot(int(x_tip1) - center[0], int(y_tip1) - center[1])
+        dist2 = np.hypot(int(x_tip2) - center[0], int(y_tip2) - center[1])
+        tip = (int(x_tip1), int(y_tip1)) if dist1 > dist2 else (int(x_tip2), int(y_tip2))
 
         # C#に渡す用に描画・確認
         debug_line = img.copy()
-        cv2.line(debug_line, (center[0], center[1]), (tip[0], tip[1]), (0, 0, 255), 2) # 指针：红色
-        cv2.circle(debug_line, center, 10, (255, 0, 0), -1)  # 軸：青色
-        cv2.circle(debug_line, tip, 10, (0, 255, 0), -1)     # 先端：緑色
+        cv2.line(debug_line, (center[0], center[1]), (tip[0], tip[1]), (0, 0, 255), 2)
+        cv2.line(debug_line, (int(x_tip1), int(y_tip1)), (int(x_tip2), int(y_tip2)), (0, 0, 255), 2)
+        cv2.circle(debug_line, center, 10, (0, 0, 0), -1)
+        cv2.circle(debug_line, tip, 10, (0, 0, 0), -1)
 
         annot_rel_path = drel(f"annotated_{ts}.jpg")
         cv2.imwrite(dpath(os.path.basename(annot_rel_path)), debug_line)
+
+        # 指針とラインフィッティングの角度を計算する
+        vector_l1 = (center[0] - tip[0], center[1] - tip[1])
+        vector_l2 = (int(x_tip1) - int(x_tip2), int(y_tip1) - int(y_tip2))
+        dot_product = np.dot(vector_l1, vector_l2)
+        norm1 = np.linalg.norm(vector_l1)
+        norm2 = np.linalg.norm(vector_l2)
+        cos_theta = dot_product / (norm1 * norm2)
+        angle_radians = np.arccos(np.clip(cos_theta, -1.0, 1.0))
+        line_angle = np.degrees(angle_radians)
 
         # 角度を計算する
         dx = tip[0] - center[0]
@@ -217,16 +246,58 @@ def measure_voltage(image):
         voltage = max(min(voltage, MAX_VOLTAGE), MIN_VOLTAGE)
         voltage = round(voltage, 2) 
 
+        # 信頼度を評価する
+        confidence = evaluate_confidence(angle, line_angle)
+
         # === 結果を標準出力 ===
         return {
             "angle_deg": float(angle),
             "value": float(voltage),
-            "confidence": 0.95,
+            "confidence": float(confidence),
             "mask_path": mask_rel_path,
             "annotated_path": annot_rel_path
         }
     except Exception as e:
         return {"error": str(e), "trace": traceback.format_exc(), "mask_path": mask_rel_path, "annotated_path": annot_rel_path}
+
+def rotate_image(image, angle):
+    """画像を指定角度回転する。"""
+    if angle == 0:
+        return image.copy()
+    h, w = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_LINEAR)
+    return rotated
+
+def measure_voltage_multi_orientation(image):
+    """
+    画像を4方向に回転させて電圧を測定し、最も信頼度の高い結果を返す。
+    """
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    mask_rel_path = ""
+    model = YOLO(MODEL_PATH)
+    crop_image, mask_rel_path = crop_with_highest_confidence(image, model, ts)
+
+    # 4方向の回転角度
+    angles = [0, 90, 180, 270]
+    results = []
+
+    # 4方向をループ
+    for angle in angles:
+        rotated_img = rotate_image(crop_image, angle)
+        result = measure_voltage(rotated_img, mask_rel_path)
+
+        # 測定に失敗した場合は、confidence=0の結果を保存
+        if "confidence" not in result:
+            result["confidence"] = 0.0
+
+        results.append(result)
+
+    # 最も信頼度の高い結果を見つける
+    best_result = max(results, key=lambda x: x.get("confidence", 0.0))
+
+    return best_result
 
 def main():
     """C# からの JSON 引数を受け取り、推定結果を標準出力（JSON）に返す。
@@ -251,7 +322,7 @@ def main():
             return 3
 
         image = cv2.imread(image_path)
-        result = measure_voltage(image)
+        result = measure_voltage_multi_orientation(image)
 
         # ここで初めてstdoutにJSONを出す
         print(json.dumps(result, ensure_ascii=False))
