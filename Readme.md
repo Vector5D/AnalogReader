@@ -10,6 +10,7 @@ AnalogReader は、カメラ映像から電圧計の値を読み取るアプリ�
 RTSP動画再生ボタンをクリックすると設定した接続先の動画を再生します。  
 撮影ボタンをクリックした時に電圧計を読み取ります。  
 画像ファイル選択ボタンをクリックすると静止画から選択することもできます。  
+テスト用画像のダウンロードはこちら ー＞ [google drive](https://drive.google.com/file/d/1zQvvyeszKFJBHfXXdMIgU1nIrsaSiDLa/view?usp=sharing)
 
 ---
 
